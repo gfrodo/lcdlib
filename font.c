@@ -195,6 +195,7 @@ uint8_t lcd_put_char(FONT_P font, uint8_t style, char character) {
    uint8_t font_height   = font_get_height_bytes(font);
    uint8_t free_space    = spc;
    PGM_P   tableposition = font_get_char_position(font,character);
+   if(!tableposition) return 0;
 
   //final size of character
   uint8_t char_final_width  = (uint8_t)(char_width+free_space) << wc;

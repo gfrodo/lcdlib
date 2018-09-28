@@ -50,7 +50,13 @@
 uint8_t lcd_current_page = 0;
 uint8_t lcd_current_column = 0;
 
-
+uint8_t stencil_y_min=0;
+uint8_t stencil_y_max=0xFF;
+uint8_t skipped_bytes=0;
+uint8_t lcd_set_stencil_y(uint8_t min, uint8_t max){
+  stencil_y_min=min;
+  stencil_y_max=max;
+}
 
 /******************************************************************************
  * Changes the internal cursor by s pages
@@ -93,6 +99,7 @@ void lcd_moveto_xy(uint8_t page, uint8_t column) {
   LCD_GOTO_ADDRESS(page,column);
   lcd_current_column = column; 
   lcd_current_page = page;
+  skipped_bytes=0;
   }
 
 /******************************************************************************
@@ -114,6 +121,15 @@ void lcd_move_xy(int8_t pages, int16_t columns) {
  * data          - the data byte
  */
 void lcd_data(uint8_t data) {
+  if(lcd_current_column<stencil_y_min || lcd_current_column>stencil_y_max){
+    lcd_inc_column(1);
+    skipped_bytes=1;
+    return;
+    }
+  if(skipped_bytes){
+    LCD_SET_COLUMN_ADDR(lcd_current_column);
+    skipped_bytes=0;
+  }
   LCD_SELECT();
   LCD_DRAM();
   spi_write(data);

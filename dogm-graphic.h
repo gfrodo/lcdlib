@@ -12,7 +12,7 @@
  * BEGIN CONFIG BLOCK
  *****************************************************************************/
 //Select the display type: DOGS102: 102, DOGM128/DOGL128: 128, DOGM132: 132, DOGXL160: 160, DOGXL240: 240
-#define DISPLAY_TYPE  240
+#define DISPLAY_TYPE  102
 
 //Display Orientation: Normal (0) or upside-down (1)?
 #define ORIENTATION_UPSIDEDOWN 0
@@ -24,39 +24,40 @@
 #define LCD_USE_BACKLIGHT   0
 
 //A0 Port (CD on DOGS & DOGXL)
-#define PORT_A0  PORTF_OUT
-#define DDR_A0   PORTF_DIR
-#define PIN_A0   1
+#define PORT_A0  PORTA.OUT
+#define DDR_A0   PORTA.DIR
+#define PIN_A0   0
 
 //Reset Port
-#define PORT_RST PORTF_OUT
-#define DDR_RST  PORTF_DIR
-#define PIN_RST  0
+#define PORT_RST PORTA.OUT
+#define DDR_RST  PORTA.DIR
+#define PIN_RST  1
 
 //Backlight Port
 #if LCD_USE_BACKLIGHT != 0
-  #define PORT_LED PORTB
-  #define DDR_LED  DDRB
+  #define PORT_LED PORTD.OUT
+  #define DDR_LED  PORTD.DIR
   #define PIN_LED  4
 #endif
 
 //Chip select
 #if LCD_USE_CHIPSELECT == 1
-  #define PORT_CS  PORTF_OUT
-  #define DDR_CS   PORTF_DIR
-  #define PIN_CS   4
+  #define PORT_CS  PORTA.OUT
+  #define DDR_CS   PORTA.DIR
+  #define PIN_CS   2
 #endif
 
 //SPI routines
 //Define a function that initializes  the SPI interface, see below for an example
-extern void init_spi_lcd(void);
-#define LCD_INIT_SPI() init_spi_lcd()
+//extern void init_spi_lcd(void);
+//#define LCD_INIT_SPI() init_spi_lcd()
+#define LCD_INIT_SPI() (SPID.CTRL=SPI_CLK2X_bm|SPI_ENABLE_bm|SPI_MASTER_bm|SPI_MODE_0_gc|SPI_PRESCALER_DIV4_gc,PORTD.DIRSET=0xA0)
 
 //Define a function that waits until SPI interface is idle
-#define spi_wait_for_idle() while(! (SPIF_STATUS & _BV(SPI_IF_bp)))
+#define spi_wait_for_idle() while(! (SPID.STATUS & _BV(SPI_IF_bp)))
 
 //Define how to write to SPI data register
-#define spi_write(i) SPIF_DATA = i
+#define spi_write(i) SPID.DATA = i
 
 //Define this if LCD Output should continue in next line when reaching edge of display
 //Used for all outputs. To enable this feature for text only, use the appropriate flag in font.h
@@ -112,6 +113,9 @@ void lcd_clear_area_xy(uint8_t pages, uint8_t columns, uint8_t style, uint8_t pa
 //Move cursor
 void lcd_moveto_xy  (uint8_t page, uint8_t column);
 void lcd_move_xy    (int8_t pages, int16_t columns);
+
+uint8_t lcd_set_stencil_y(uint8_t min, uint8_t max);
+
 
 //Set display contrast
 #if DISPLAY_TYPE == 240

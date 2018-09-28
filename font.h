@@ -32,7 +32,7 @@ typedef const struct font_info * FONT_P;
 
 //Set to 1 to include functions for direct output of integer & float values
 #define INCLUDE_FLOAT_OUTPUT     0
-#define INCLUDE_INTEGER_OUTPUT   1
+#define INCLUDE_INTEGER_OUTPUT   0
 
 
 /*****************************************************************************
